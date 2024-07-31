@@ -1,0 +1,78 @@
+\documentclass[a4paper, 11pt, oneside]{book}
+\usepackage[a4paper, margin=110pt]{geometry}
+\usepackage{mlmodern}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+\usepackage{parskip}
+\usepackage{gnos}
+\usepackage{varwidth}
+\usepackage{flushend}
+\usepackage{multicol}
+\usepackage[breakall]{truncate}
+
+% https://tex.stackexchange.com/a/313605
+\pdfinfoomitdate=1
+\pdftrailerid{}
+\hbadness=10000
+
+\makeatletter
+\def\HUGE{\@setfontsize\Huge{40}{40}}
+\makeatother
+
+\def\title#1{%
+  \begin{titlepage}%
+  \centering%
+  \vspace*{60pt}%
+  \rule{\textwidth}{8pt}\\%
+  \vspace{10pt}%
+  {\scshape\HUGE{#1}\\}%
+  \vspace{17.4pt}%
+  \rule{\textwidth}{8pt}%
+  \end{titlepage}%
+  \clearpage%
+  \setcounter{page}{0}%
+  \pagestyle{plain}%
+}
+
+
+\def\countproblems{%
+  \newcounter{pcount}%
+  \def\p##1{\stepcounter{pcount}}%
+  \problems%
+  \thepcount%
+}
+
+\def\renderproblems{%
+  \def\line#1{\truncate[]{150pt}{#1}\\}%
+  \def\halfgoban{%
+    \def\line#1{#1\\}%
+    \clearpage%
+  }
+  \def\p##1{%
+    \hspace{5pt}%
+    \begin{varwidth}{\textwidth}%
+      ~\\[4pt]%
+      \center%
+      \small\input{problems/\jobname/##1.gnos}%
+      \vspace{5pt}%
+      \center{(##1)}%
+    \end{varwidth}%
+    \allowbreak%
+    \hfil%
+  }%
+  \newgeometry{margin=40pt, top=50pt, bottom=80pt}%
+  \begin{center}%
+  \hspace{-5pt}% don't judge
+  \problems%
+  \end{center}%
+  \clearpage%
+}
+
+\def\rendersolutions{%
+  \def\halfgoban{}%
+  \begin{multicols}{2}%
+    \def\p##1{{\footnotesize(##1)\:\:\input{problems/\jobname/##1.solution}}\\}%
+    \problems%
+  \end{multicols}%
+  \clearpage%
+}
