@@ -149,7 +149,8 @@ def main(path: str) -> None:
     (p := p.rotate()),
     (p := p.rotate()),
   ]
-  theproblem = min(permutations, key=lambda x: (x.height, x.width))
+  # the 3rd key component is a tie breaker to allow duplicate detection
+  theproblem = min(permutations, key=lambda x: (x.height, x.width, sorted(x.initial_blacks)))
   solution_moves = " ".join(map(to_goban_coordinate, theproblem.moves[:12]))
 
   stem = path.removesuffix(".json")
