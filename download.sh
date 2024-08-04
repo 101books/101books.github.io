@@ -3,44 +3,56 @@ set -eu #x
 # depends on htmlq: https://github.com/mgdm/htmlq
 # depdens on ifne: https://manpages.debian.org/bookworm/moreutils/
 
+throwaway_accounts="\
+comoti7227%40atebin.com
+fimowal358%40apn7.com
+mahet70277%40bacaki.com
+wojaga4524%40calunia.com
+sababib768%40cartep.com
+fetayi5707%40furnato.com
+rarejik433%40apn7.com
+riyodov302%40alientex.com
+perakax293%40mvpalace.com
+kowon74620%40alientex.com"
+
+get_cookie() {
+  email=$(echo "$throwaway_accounts" | shuf -n1)
+  csr_token=$(curl -s https://www.101weiqi.com/ | grep -Po "name='csrfmiddlewaretoken' value='\K[^']+")
+  login=$(echo $email | cut -d'%' -f1)
+  curl \
+    --silent \
+    --output /dev/null \
+    --header 'content-type: application/x-www-form-urlencoded' \
+    --data-raw "csrfmiddlewaretoken=$csr_token&source=index_nav&form_username=$login&form_password=$email" \
+    --request POST \
+    --dump-header - https://www.101weiqi.com/login/ \
+    | grep -Po 'set-cookie: \K[^;]+;' \
+    | xargs
+}
+
 download() {
   book_name="$1"
   book_id="$2"
+  cookie=""
   curl "https://www.101weiqi.com/book$book_id" --silent | htmlq ".questionitem" --attribute href a | while read -r problem_url; do
     json="problems/$book_name/$(echo "$problem_url" | cut -d/ -f 4-5).json"
     mkdir -p "$(dirname "$json")"
     if test -f "$json"; then
-      echo "skipping $json"
+      echo "skipping '$json'"
     else
       while test ! -f "$json"; do
-        sleep 1
-        cookie=$(printf "$cookies" | shuf -n1)
-        echo "downloading $json using $cookie"
-        curl "https://www.101weiqi.com$problem_url" -H "$cookie" --silent |\
+        echo "downloading '$json' using cookie='$cookie'"
+        curl "https://www.101weiqi.com$problem_url" -H "cookie: $cookie'" --silent |\
           grep -oP 'var g_qq = \K.*(?=;var taskinfo)' |\
           ifne tee "$json" >/dev/null
+        if test ! -f "$json"; then
+          cookie=$(get_cookie)
+        fi
       done
     fi
   done
 }
 
-# throwaway 101weiqi accounts:
-# comoti7227@atebin.com
-# fimowal358@apn7.com
-# mahet70277@bacaki.com
-# wojaga4524@calunia.com
-# sababib768@cartep.com
-# fetayi5707@furnato.com
-# rarejik433@apn7.com
-cookies="\
-cookie: csrftoken=5HcMhB9xblJIiGUKd6GVfblwadZKuKrM55RebC7PeKMTB96myIDevyVS2NVoUGHB; sessionid=f6pjju6hew0k0sjy8c6p5onfi4csjwc6
-cookie: csrftoken=xXBhSUvxM4eZ1bNgjy5ZdhBDxafymKsOeGIoORvsNSTftkUgtQ8mHJ9roSHg40p0; sessionid=hkh84n8dsafkrf9ccfywq9ap3x80t8eb
-cookie: csrftoken=enlAlnH2H6qCC3JFdjIcQN3CjoFSvUi4J8ZmYtaCfUSPH27MZ6w7xdpNfaPorf9P; sessionid=pl64gvr9ynqs5b3slc2q6h67m1gjp3uu
-cookie: csrftoken=ud5PL3nwGU5q3JSh3nSyHT7jraoYoZs2W36M5LTyhAEkpMuCmaVNQdwPwQE817nB; sessionid=mbvxzjo45h3upyojtiiura80zq7okjqo
-cookie: csrftoken=sSiFXDmXaqS0qydyiVxFZcN0h2DmftwtmuYZMtC4EvRLX4MjBGpR5weYtnGwVYE5; sessionid=jt0ro3dgfa4tp66xjfewyj9w5xuzlu2x
-cookie: csrftoken=smbXsEkBCe15kBHrRkZLH2Gqnbw08qT7lnMifa91JrIoKOBfyMVEa7A55G9tY6Uc; sessionid=8u6ixw392jucq1qvzwfliymv1u0kw9dp"
-
-download seedling-project /c/0/
 # https://senseis.xmp.net/?MaedaTsumego
 download maeda-tsumego /28492/17267/
 download maeda-tsumego /28503/17296/
@@ -143,3 +155,40 @@ download leechangho-tsumego /446/940/
 download leechangho-tsumego /446/941/
 download leechangho-tsumego /446/942/
 download leechangho-tsumego /446/943/
+# https://senseis.xmp.net/?WeiqiLifeAndDeath1000Problems
+download weiqi-1000 /52265/83473/
+download weiqi-1000 /52265/83472/
+download weiqi-1000 /52265/83471/
+download weiqi-1000 /52265/83470/
+download weiqi-1000 /52265/83469/
+download weiqi-1000 /52265/83468/
+download weiqi-1000 /52265/83467/
+download weiqi-1000 /52265/83466/
+download weiqi-1000 /52265/83465/
+download weiqi-1000 /52265/83464/
+download weiqi-1000 /52265/83463/
+download weiqi-1000 /52265/83462/
+download weiqi-1000 /52265/83461/
+download weiqi-1000 /52265/83460/
+download weiqi-1000 /52265/83459/
+download weiqi-1000 /52265/83458/
+download weiqi-1000 /52265/83457/
+download weiqi-1000 /52265/83456/
+download weiqi-1000 /52265/83455/
+download weiqi-1000 /52265/83454/
+download weiqi-1000 /52265/83453/
+download weiqi-1000 /52265/83452/
+download weiqi-1000 /52265/83451/
+download weiqi-1000 /52265/83450/
+download weiqi-1000 /52265/83448/
+# other
+download leechangho-endgame /29867/0/
+download korean-endgame /634/1167/
+download korean-endgame /634/1173/
+download korean-endgame /634/17885/
+download sakataeio-endgame /894/1772/
+download sakataeio-endgame /894/1773/
+download sakataeio-endgame /894/1774/
+download sakataeio-endgame /894/1775/
+download hashimotoutaro-endgame /312/659/
+download seedling-project /117/0/
