@@ -1,0 +1,124 @@
+\documentclass[a4paper, 11pt]{book}
+\usepackage[a4paper]{geometry}
+\usepackage{mlmodern}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+\usepackage{parskip}
+\usepackage{gnos}
+\usepackage{varwidth}
+\usepackage{multicol}
+\usepackage[breakall]{truncate}
+\usepackage[twoside]{fancyhdr}
+\usepackage{CJKutf8}
+\usepackage[none]{hyphenat}
+\usepackage{hyperref}
+
+\pagestyle{fancy}
+\setlength{\headheight}{110pt}
+\fancyhead{}
+\fancyfoot{}
+\fancyhead[LE,RO]{\large\thepage}
+\fancyhead[LO,RE]{\sc\large\entitle}
+
+\pdfinfoomitdate=1
+\pdftrailerid{}
+\hbadness=10000
+\vbadness=10000
+
+\newcounter{pcount}%
+
+\makeatletter
+\def\HUGE{\@setfontsize\Huge{35}{35}}
+\makeatother
+
+\def\countproblems{%
+  \setcounter{pcount}{0}%
+  \def\halfgoban{}%
+  \def\p##1##2{\stepcounter{pcount}}%
+  \problems%
+  \thepcount%
+}
+
+\def\rendertitle{
+  \newgeometry{margin=100pt, top=230pt}%
+  \thispagestyle{empty}
+  \raggedright
+  \HUGE\entitle\phantom{g}\\
+  \vspace{5pt}
+  \Huge
+  \ifdefined\jptitle\begin{CJK}{UTF8}{min}{\jptitle}\end{CJK}\fi%
+  \ifdefined\kotitle\begin{CJK}{UTF8}{mj}{\kotitle}\end{CJK}\fi%
+  \ifdefined\zhtitle\begin{CJK}{UTF8}{gbsn}{\zhtitle}\end{CJK}\fi%
+  \vspace{30pt}
+  \Large
+  \par Problems: \countproblems
+  \par Difficulty: \level
+  \par Source: \source
+  \par All problems are black to play
+  \clearpage
+}
+
+\def\renderproblems{%
+  \setcounter{pcount}{0}%
+  \fancyhfoffset{-20pt}%
+  \newgeometry{margin=40pt, top=102pt, bottom=80pt, headsep=40pt}%
+  \def\line##1{\truncate[]{150pt}{##1}\\}%
+  \def\hvspace{%
+    \hspace{5pt}%
+    \vspace{5pt}%
+  }%
+  \def\halfgoban{%
+    \def\line####1{####1\\}%
+    \def\hvspace{%
+      \hspace{18.2pt}%
+      \vspace{7.5pt}%
+    }%
+    \clearpage%
+    \hspace{-18.2pt}%
+  }%
+  \def\p##1##2{%
+    \stepcounter{pcount}%
+    \hvspace%
+    \begin{varwidth}{\textwidth}%
+      \center%
+      \small%
+      \input{problems/\jobname/##1/##2.gnos}%
+      \normalsize\thepcount%
+    \end{varwidth}%
+    \allowbreak%
+    \hfil%
+  }%
+  \begin{center}%
+  \hspace{-5pt}%
+  \problems%
+  \end{center}%
+  \clearpage%
+}
+
+\def\rendersolutions{%
+  \setcounter{pcount}{0}%
+  \fancyhfoffset{0pt}%
+  \newgeometry{margin=60pt, top=82pt, bottom=80pt}%
+  \def\halfgoban{}%
+  \def\p##1##2{%
+    \stepcounter{pcount}%
+    {%
+      \href{https://www.101weiqi.com/error/##2}{(\thepcount)}%
+      \:\:%
+      \input{problems/\jobname/##1/##2.solution}%
+    }
+
+  }%
+  \begin{multicols*}{2}%
+    \setlength{\parskip}{2.7pt}%
+    \footnotesize%
+    \problems%
+  \end{multicols*}%
+  \clearpage%
+}
+
+\begin{document}
+\rendertitle%
+\renderproblems%
+\rendersolutions%
+\end{document}
