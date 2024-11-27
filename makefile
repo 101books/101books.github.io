@@ -9,28 +9,28 @@ GSFLAGS := -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH
 .PRECIOUS: %.gnos
 
 # overview of what makes what:
-# ./download.sh:  101weiqi.com -> problems/*.json     (to be run manually)
-# ./extract.py:   problems/*.json -> problems/*.gnos  (%.gnos: %.json rule below)
-# pdflatex+gs:    *.tex + problems/*.gnos -> *.pdf    (%.pdf: %.tex rule below)
+# ./download.sh:  101weiqi.com -> problems/*.json
+# ./extract.py:   problems/*.json -> problems/*.gnos
+# pdflatex+gs:    books/*.tex + problems/*.gnos -> pdfs/*.pdf
 
 # dependencies:
 # https://github.com/otrego/go-type1
 # https://packages.debian.org/stable/texlive
 # https://packages.debian.org/stable/ghostscript
 
-books = $(shell find . -maxdepth 1 -name "*.tex" -not -name header.tex)
+books = $(shell ls books | grep -v header.tex | xargs -i echo pdfs/{})
 all: $(books:.tex=.pdf)
 
 %.gnos: %.json extract.py
 - ./extract.py "$<"
 
-%.pdf: %.tex header.tex $$(shell find problems/$$(*F)/ -name "*.json" | sed -e "s/.json/.gnos/")
+pdfs/%.pdf: books/%.tex books/header.tex $$(shell find problems/$$(*F)/ -name "*.json" | sed -e "s/.json/.gnos/")
 - mkdir .latex.out
 - pdflatex -output-directory=.latex.out -interaction=nonstopmode "$<"
-- gs $(GSFLAGS) -sOutputFile="$@" .latex.out/"$@" && echo "minimized: $@"
+- gs $(GSFLAGS) -sOutputFile="$@" .latex.out/"$(@F)" && echo "minimized: $@"
 
 clean: FORCE
-- rm -rf -- .latex.out/* *.pdf
+- rm -rf -- .latex.out/* pdfs/*.pdf
 
 watch: FORCE
 - git ls-files | entr make
@@ -65,10 +65,10 @@ duplicates.log: FORCE
 - find problems -name "*.gnos" -exec md5sum {} + | sort | uniq -w32 -dD > $@
 
 problem-count.log: FORCE
-- expr $$(pdfgrep -Poh "Problems: \K[0-9]+" *.pdf | xargs -i bash -c "printf '{} + '")0 | tee $@
+- expr $$(pdfgrep -Poh "Problems: \K[0-9]+" pdfs/*.pdf | xargs -i bash -c "printf '{} + '")0 | tee $@
 
 page-count.log: FORCE
-- lynx -dump -listonly /home/olivier/workspace/101books/index.html | grep file | cut -d/ -f8 | xargs -i bash -c 'printf "{}:\t" && pdfinfo "{}" | grep Pages | awk "{print \$$2}"' | expand -t 10,33 | tee $@
+- lynx -dump -listonly /home/olivier/workspace/101books/index.html | grep file | cut -d/ -f8-9 | xargs -i bash -c 'printf "{}:\t" && pdfinfo "{}" | grep Pages | awk "{print \$$2}"' | expand -t 10,40 | tee $@
 
 # (
 #   echo "\def\problems{%"
@@ -91,6 +91,6 @@ page-count.log: FORCE
 #     | cut -d/ -f3-4 | sed s/.sgf//  \
 #     | xargs -i echo "%\p{{}}%full-goban"
 #   echo "}"
-#   echo "\input{header}"
+#   echo "\input{books/header}"
 # ) >> $book.tex
 # cat duplicates.log | grep $book | cut -d" " -f3 | sort -V | cut -d/ -f3-4 | cut -d. -f1 | xargs -i sed -i 's|\\p{{}}%|%\\p{{}}%duplicate|g' $book.tex
