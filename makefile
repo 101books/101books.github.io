@@ -27,7 +27,7 @@ all: $(books:.tex=.pdf)
 pdfs/%.pdf: books/%.tex books/header.tex $$(shell find problems/$$(*F)/ -name "*.json" | sed -e "s/.json/.gnos/")
 - mkdir .latex.out
 - pdflatex -output-directory=.latex.out -interaction=nonstopmode "$<"
-- gs $(GSFLAGS) -sOutputFile="$@" .latex.out/"$(@F)" && echo "minimized: $@"
+- cp .latex.out/"$(@F)" "$@"
 
 clean: FORCE
 - rm -rf -- .latex.out/* pdfs/*.pdf

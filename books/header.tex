@@ -12,6 +12,15 @@
 \usepackage{CJKutf8}
 \usepackage[none]{hyphenat}
 \usepackage{hyperref}
+\usepackage{xcolor}
+
+% https://tex.stackexchange.com/a/313605
+\pdfinfoomitdate=1
+\pdftrailerid{}
+\pdfsuppressptexinfo=-1
+
+\definecolor[named]{darkblueish}{cmyk}{1,0.58,0,0.21}
+\hypersetup{colorlinks=true, urlcolor=darkblueish}
 
 \pagestyle{fancy}
 \setlength{\headheight}{110pt}
@@ -20,8 +29,6 @@
 \fancyhead[LE,RO]{\large\thepage}
 \fancyhead[LO,RE]{\sc\large\entitle}
 
-\pdfinfoomitdate=1
-\pdftrailerid{}
 \hbadness=10000
 \vbadness=10000
 
@@ -54,7 +61,7 @@
   \Large
   \par Problems: \countproblems
   \par Difficulty: \level
-  \par Source: \source
+  \par Source: \href{\source}{\source}
   \par All problems are black to play
   \clearpage
 }
@@ -112,7 +119,7 @@
   \def\p##1##2{%
     \stepcounter{pcount}%
     {%
-      \href{https://www.101weiqi.com/q/##2}{(\thepcount)}%
+      (\href{https://www.101weiqi.com/q/##2}{\thepcount})%
       \:\:%
       \input{problems/\jobname/##1/##2.solution}%
     }
