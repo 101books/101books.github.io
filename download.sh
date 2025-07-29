@@ -16,43 +16,45 @@ perakax293%40mvpalace.com
 kowon74620%40alientex.com"
 
 get_cookie() {
-  email=$(echo "$throwaway_accounts" | shuf -n1)
-  csr_token=$(curl -s https://www.101weiqi.com/ | grep -Po "name='csrfmiddlewaretoken' value='\K[^']+")
-  login=$(echo $email | cut -d'%' -f1)
-  curl \
-    --silent \
-    --output /dev/null \
-    --header 'content-type: application/x-www-form-urlencoded' \
-    --data-raw "csrfmiddlewaretoken=$csr_token&source=index_nav&form_username=$login&form_password=$email" \
-    --request POST \
-    --dump-header - https://www.101weiqi.com/login/ \
-    | grep -Po 'set-cookie: \K[^;]+;' \
-    | xargs
+    email=$(echo "$throwaway_accounts" | shuf -n1)
+    login=$(echo $email | cut -d'%' -f1)
+    curl \
+        --silent \
+        --output /dev/null \
+        --header 'content-type: application/x-www-form-urlencoded' \
+        --data-raw "username=$login&password=$email" \
+        --request POST \
+        --dump-header - https://www.101weiqi.com/wq/login/ \
+        | grep -Po 'set-cookie: \K[^;]+;' \
+        | xargs
 }
 
 download() {
   book_name="$1"
   book_id="$2"
   cookie=""
-  curl "https://www.101weiqi.com/book$book_id" --silent | htmlq ".questionitem" --attribute href a | while read -r problem_url; do
+  curl "https://www.101weiqi.com/book$book_id" --silent |\
+        htmlq "div.timus.card-wrapper a" --attribute href |\
+        while read -r problem_url; do
     json="problems/$book_name/$(echo "$problem_url" | cut -d/ -f 4-5).json"
     mkdir -p "$(dirname "$json")"
     if test -f "$json"; then
-      echo "skipping '$json'"
+        echo "skipping '$json'"
     else
-      while test ! -f "$json"; do
+    while test ! -f "$json"; do
         echo "downloading '$json' using cookie='$cookie'"
-        curl "https://www.101weiqi.com$problem_url" -H "cookie: $cookie'" --silent |\
-          grep -oP 'var g_qq = \K.*(?=;var taskinfo)' |\
-          ifne tee "$json" >/dev/null
+        curl "https://www.101weiqi.com$problem_url" -b "$cookie" --silent |\
+            grep -oP '^var qqdata = \K.*(?=;$)' |\
+            ifne tee "$json" >/dev/null
         if test ! -f "$json"; then
-          cookie=$(get_cookie)
+            cookie=$(get_cookie)
         fi
-      done
+    done
     fi
-  done
+done
 }
 
+exit 0
 download compact-puzzles /28294/16403/
 download compact-puzzles /28294/16404/
 download compact-puzzles /28294/16405/
