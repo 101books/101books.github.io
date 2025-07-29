@@ -54,6 +54,17 @@ download() {
 done
 }
 
+download common-problems /421/876/
+download common-problems /421/12834/
+download common-problems /421/877/
+download common-problems /421/877/?page=2
+download common-problems /421/878/
+download common-problems /421/879/
+download common-problems /421/880/
+download common-problems /421/881/
+download common-problems /421/882/
+download common-problems /421/883/
+
 exit 0
 download compact-puzzles /28294/16403/
 download compact-puzzles /28294/16404/

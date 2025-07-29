@@ -76,21 +76,21 @@ page-count.log: FORCE
 #     | grep -v --file high-problems.log \
 #     | grep -v --file wide-problems.log \
 #     | sort -V \
-#     | cut -d/ -f3-4 | sed s/.sgf//  \
+#     | cut -d/ -f3-4 | sed s/.sgf// | sed "s|/|}{|"  \
 #     | xargs -i echo "\p{{}}%"
 #   echo "\halfgoban%"
 #   find problems/$book -name *.sgf \
 #     | grep -v --file high-problems.log \
 #     | grep --file wide-problems.log \
 #     | sort -V \
-#     | cut -d/ -f3-4 | sed s/.sgf//  \
+#     | cut -d/ -f3-4 | sed s/.sgf// | sed "s|/|}{|"  \
 #     | xargs -i echo "\p{{}}%"
 #   find problems/$book -name *.sgf \
 #     | grep --file high-problems.log \
 #     | sort -V \
-#     | cut -d/ -f3-4 | sed s/.sgf//  \
+#     | cut -d/ -f3-4 | sed s/.sgf// | sed "s|/|}{|"  \
 #     | xargs -i echo "%\p{{}}%full-goban"
 #   echo "}"
 #   echo "\input{books/header}"
-# ) >> $book.tex
+# ) >> books/$book.tex
 # cat duplicates.log | grep $book | cut -d" " -f3 | sort -V | cut -d/ -f3-4 | cut -d. -f1 | xargs -i sed -i 's|\\p{{}}%|%\\p{{}}%duplicate|g' $book.tex
