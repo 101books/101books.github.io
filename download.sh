@@ -54,6 +54,14 @@ download() {
 done
 }
 
+download capturing-races /28158/16018/
+download capturing-races /28158/16019/
+download capturing-races /28158/16022/
+download capturing-races /28158/16023/
+download capturing-races /28158/16024/
+download capturing-races /28158/16025/
+
+exit 0
 download common-problems /421/876/
 download common-problems /421/12834/
 download common-problems /421/877/
@@ -64,8 +72,6 @@ download common-problems /421/880/
 download common-problems /421/881/
 download common-problems /421/882/
 download common-problems /421/883/
-
-exit 0
 download compact-puzzles /28294/16403/
 download compact-puzzles /28294/16404/
 download compact-puzzles /28294/16405/
