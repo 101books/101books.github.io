@@ -54,11 +54,16 @@ download() {
 done
 }
 
+download ishida-tesuji /463/138865/?page=1
+download ishida-tesuji /463/138865/?page=2
+download ishida-tesuji /463/138865/?page=3
+download ishida-tesuji /463/138865/?page=4
+download ishida-tesuji /463/138865/?page=5
+
+exit 0
 download ishida-tsumego /28487/17252/
 download ishida-tsumego /28487/17253/
 download ishida-tsumego /28487/17254/
-
-exit 0
 download ohashi-powerup /26342/15628/
 download ohashi-powerup /26342/15629/
 download ohashi-powerup /26342/15630/
