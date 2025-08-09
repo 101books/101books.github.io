@@ -54,13 +54,16 @@ download() {
 done
 }
 
+download ishida-tsumego /28487/17252/
+download ishida-tsumego /28487/17253/
+download ishida-tsumego /28487/17254/
+
+exit 0
 download ohashi-powerup /26342/15628/
 download ohashi-powerup /26342/15629/
 download ohashi-powerup /26342/15630/
 download ohashi-powerup /26342/15631/
 download ohashi-powerup /26342/141485/
-
-exit 0
 download btiyfsag /29806/21015/
 download btiyfsag /29806/21016/
 download btiyfsag /29806/21017/
