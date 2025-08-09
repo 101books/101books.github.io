@@ -54,14 +54,19 @@ download() {
 done
 }
 
+download ohashi-powerup /26342/15628/
+download ohashi-powerup /26342/15629/
+download ohashi-powerup /26342/15630/
+download ohashi-powerup /26342/15631/
+download ohashi-powerup /26342/141485/
+
+exit 0
 download btiyfsag /29806/21015/
 download btiyfsag /29806/21016/
 download btiyfsag /29806/21017/
 download btiyfsag /29806/21018/
 download btiyfsag /29806/21019/
 download btiyfsag /29806/21020/
-
-exit 0
 download capturing-races /28158/16018/
 download capturing-races /28158/16019/
 download capturing-races /28158/16022/
