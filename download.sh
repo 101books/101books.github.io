@@ -54,13 +54,16 @@ download() {
 done
 }
 
+download hashimoto-masterpiece-collection /28506/17300/
+download hashimoto-masterpiece-collection /28506/17299/
+download hashimoto-masterpiece-collection /28506/17301/
+
+exit 0
 download ishida-tesuji /463/138865/?page=1
 download ishida-tesuji /463/138865/?page=2
 download ishida-tesuji /463/138865/?page=3
 download ishida-tesuji /463/138865/?page=4
 download ishida-tesuji /463/138865/?page=5
-
-exit 0
 download ishida-tsumego /28487/17252/
 download ishida-tsumego /28487/17253/
 download ishida-tsumego /28487/17254/
