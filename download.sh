@@ -34,16 +34,16 @@ download() {
   book_id="$2"
   cookie=""
   curl "https://www.101weiqi.com/book$book_id" --silent |\
-        htmlq "div.timus.card-wrapper a" --attribute href |\
-        while read -r problem_url; do
-    json="problems/$book_name/$(echo "$problem_url" | cut -d/ -f 4-5).json"
+        htmlq --text "div.timus.card-wrapper span span" |\
+        while read -r problem_id; do
+    json="problems/$book_name/$problem_id.json"
     mkdir -p "$(dirname "$json")"
     if test -f "$json"; then
         echo "skipping '$json'"
     else
     while test ! -f "$json"; do
         echo "downloading '$json' using cookie='$cookie'"
-        curl "https://www.101weiqi.com$problem_url" -b "$cookie" --silent |\
+        curl "https://www.101weiqi.com/q/$problem_id/" -b "$cookie" --silent |\
             grep -oP '^var qqdata = \K.*(?=;$)' |\
             ifne tee "$json" >/dev/null
         if test ! -f "$json"; then

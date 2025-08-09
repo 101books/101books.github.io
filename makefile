@@ -20,6 +20,7 @@ GSFLAGS := -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH
 
 books = $(shell ls books | grep -v header.tex | xargs -i echo pdfs/{})
 all: $(books:.tex=.pdf)
+logs: levels.log high-problems.log wide-problems.log duplicates.log problem-count.log page-count.log
 
 %.gnos: %.json extract.py
 - ./extract.py "$<"
@@ -61,9 +62,11 @@ high-problems.log: FORCE
 wide-problems.log: FORCE
 - find problems -name "*.sgf" -exec grep "\[[lmnopqrs]" -l {} + | sort -V > $@
 
+# grep $book duplicates.log | cut -d/ -f4 | cut -d. -f1 | xargs -i sed -i s/^[^%]+*{}/% books/$book.tex
 duplicates.log: FORCE
 - find problems -name "*.gnos" -exec md5sum {} + | sort | uniq -w32 -dD > $@
 
+# sed -i "s@.*booklets.*@      Here is a selection of $(ls pdfs | wc -l) go/weiqi/baduk booklets, featuring a total of $(sed -E ':a;s/^([0-9]+)([0-9]{3})/\1'\''\2/;ta' problem-count.log) problems.@" index.html
 problem-count.log: FORCE
 - expr $$(pdfgrep -Poh "Problems: \K[0-9]+" pdfs/*.pdf | xargs -i bash -c "printf '{} + '")0 | tee $@
 
@@ -93,4 +96,3 @@ page-count.log: FORCE
 #   echo "}"
 #   echo "\input{books/header}"
 # ) >> books/$book.tex
-# cat duplicates.log | grep $book | cut -d" " -f3 | sort -V | cut -d/ -f3-4 | cut -d. -f1 | xargs -i sed -i 's|\\p{{}}%|%\\p{{}}%duplicate|g' $book.tex
