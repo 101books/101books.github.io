@@ -54,14 +54,20 @@ download() {
 done
 }
 
+download btiyfsag /29806/21015/
+download btiyfsag /29806/21016/
+download btiyfsag /29806/21017/
+download btiyfsag /29806/21018/
+download btiyfsag /29806/21019/
+download btiyfsag /29806/21020/
+
+exit 0
 download capturing-races /28158/16018/
 download capturing-races /28158/16019/
 download capturing-races /28158/16022/
 download capturing-races /28158/16023/
 download capturing-races /28158/16024/
 download capturing-races /28158/16025/
-
-exit 0
 download common-problems /421/876/
 download common-problems /421/12834/
 download common-problems /421/877/
