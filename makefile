@@ -66,7 +66,7 @@ wide-problems.log: FORCE
 duplicates.log: FORCE
 - find problems -name "*.gnos" -exec md5sum {} + | sort | uniq -w32 -dD > $@
 
-# sed -i "s@.*booklets.*@      Here is a selection of $(ls pdfs | wc -l) go/weiqi/baduk booklets, featuring a total of $(sed -E ':a;s/^([0-9]+)([0-9]{3})/\1'\''\2/;ta' problem-count.log) problems.@" index.html
+# make problem-count.log && sed -i "s@.*booklets.*@      Here is a selection of $(ls pdfs | wc -l) go/weiqi/baduk booklets, featuring a total of $(sed -E ':a;s/^([0-9]+)([0-9]{3})/\1'\''\2/;ta' problem-count.log) problems.@" index.html
 problem-count.log: FORCE
 - expr $$(pdfgrep -Poh "Problems: \K[0-9]+" pdfs/*.pdf | xargs -i bash -c "printf '{} + '")0 | tee $@
 

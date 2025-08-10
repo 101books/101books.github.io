@@ -6,16 +6,13 @@ set -eu #x
 
 download() {
   book_name="$1"
-  book_id="$2"
-  chapter_id="$(echo $book_id | cut -d/ -f2)"
-  curl "https://www.101weiqi.com/book$book_id" --silent |\
+  book_url="$2"
+  book_id="$(echo $book_url | cut -d/ -f2)"
+  chapter_id="$(echo $book_url | cut -d/ -f3)"
+  curl --proxy "socks5h://localhost:9050" "https://www.101weiqi.com/book$book_url" --silent |\
         htmlq --text "div.timus.card-wrapper span span" |\
         while read -r problem_id; do
     json="problems/$book_name/$chapter_id/$problem_id.json"
-    mkdir -p "$(dirname "$json")"
-    if test -f "problems/$book_name/$problem_id.json"; then
-        mv "problems/$book_name/$problem_id.json" "$json"
-    fi
     while test ! -f "$json"; do
         echo "downloading '$json'"
         curl --proxy "socks5h://localhost:9050" "https://www.101weiqi.com/q/$problem_id/" --silent |\
@@ -29,30 +26,30 @@ download() {
 done
 }
 
-download go-seigen /1220/2585/?page=1
-download go-seigen /1220/2585/?page=2
-download go-seigen /1220/2585/?page=3
-download go-seigen /1220/2585/?page=4
-download go-seigen /1221/2586/
-download go-seigen /1221/2587/
-download go-seigen /1221/2588/
-download go-seigen /1221/2589/
-download go-seigen /1221/2597/
-download go-seigen /1225/2594/
-download go-seigen /1225/2595/
-download go-seigen /1225/2596/
-download go-seigen /1222/2590/?page=1
-download go-seigen /1223/2591/?page=1
-download go-seigen /1222/2590/?page=2
-download go-seigen /1224/2592/?page=1
-download go-seigen /1224/2593/?page=1
-download go-seigen /1224/2592/?page=2
-download go-seigen /1224/2593/?page=2
-download go-seigen /1223/2591/?page=2
-download go-seigen /1222/2590/?page=3
-download go-seigen /1223/2591/?page=3
-download go-seigen /1222/2590/?page=4
-download go-seigen /1223/2591/?page=4
+download go-seigen-tsumego /1220/2585/?page=1
+download go-seigen-tsumego /1220/2585/?page=2
+download go-seigen-tsumego /1220/2585/?page=3
+download go-seigen-tsumego /1220/2585/?page=4
+download go-seigen-tsumego /1221/2586/
+download go-seigen-tsumego /1221/2587/
+download go-seigen-tsumego /1221/2588/
+download go-seigen-tsumego /1221/2589/
+download go-seigen-tsumego /1221/2597/
+download go-seigen-tsumego /1222/2590/?page=1
+download go-seigen-tsumego /1222/2590/?page=2
+download go-seigen-tsumego /1222/2590/?page=3
+download go-seigen-tsumego /1222/2590/?page=4
+download go-seigen-tsumego /1223/2591/?page=1
+download go-seigen-tsumego /1223/2591/?page=2
+download go-seigen-tsumego /1223/2591/?page=3
+download go-seigen-tsumego /1223/2591/?page=4
+download go-seigen-tsumego /1224/2592/?page=1
+download go-seigen-tsumego /1224/2592/?page=2
+download go-seigen-tsumego /1224/2593/?page=1
+download go-seigen-tsumego /1224/2593/?page=2
+download go-seigen-tsumego /1225/2594/
+download go-seigen-tsumego /1225/2595/
+download go-seigen-tsumego /1225/2596/
 exit 0
 
 download hashimoto-masterpiece-collection /28506/17300/
