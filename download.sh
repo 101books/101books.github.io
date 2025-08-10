@@ -1,64 +1,63 @@
 #!/bin/sh
 set -eu #x
 # depends on htmlq: https://github.com/mgdm/htmlq
-# depdens on ifne: https://manpages.debian.org/bookworm/moreutils/
-
-throwaway_accounts="\
-comoti7227%40atebin.com
-fimowal358%40apn7.com
-mahet70277%40bacaki.com
-wojaga4524%40calunia.com
-sababib768%40cartep.com
-fetayi5707%40furnato.com
-rarejik433%40apn7.com
-riyodov302%40alientex.com
-perakax293%40mvpalace.com
-kowon74620%40alientex.com"
-
-get_cookie() {
-    email=$(echo "$throwaway_accounts" | shuf -n1)
-    login=$(echo $email | cut -d'%' -f1)
-    curl \
-        --silent \
-        --output /dev/null \
-        --header 'content-type: application/x-www-form-urlencoded' \
-        --data-raw "username=$login&password=$email" \
-        --request POST \
-        --dump-header - https://www.101weiqi.com/wq/login/ \
-        | grep -Po 'set-cookie: \K[^;]+;' \
-        | xargs
-}
+# depends on ifne: https://manpages.debian.org/bookworm/moreutils/
+# depends on tor: https://manpages.debian.org/bookworm/tor/
 
 download() {
   book_name="$1"
   book_id="$2"
-  cookie=""
+  chapter_id="$(echo $book_id | cut -d/ -f2)"
   curl "https://www.101weiqi.com/book$book_id" --silent |\
         htmlq --text "div.timus.card-wrapper span span" |\
         while read -r problem_id; do
-    json="problems/$book_name/$problem_id.json"
+    json="problems/$book_name/$chapter_id/$problem_id.json"
     mkdir -p "$(dirname "$json")"
-    if test -f "$json"; then
-        echo "skipping '$json'"
-    else
+    if test -f "problems/$book_name/$problem_id.json"; then
+        mv "problems/$book_name/$problem_id.json" "$json"
+    fi
     while test ! -f "$json"; do
-        echo "downloading '$json' using cookie='$cookie'"
-        curl "https://www.101weiqi.com/q/$problem_id/" -b "$cookie" --silent |\
+        echo "downloading '$json'"
+        curl --proxy "socks5h://localhost:9050" "https://www.101weiqi.com/q/$problem_id/" --silent |\
             grep -oP '^var qqdata = \K.*(?=;$)' |\
             ifne tee "$json" >/dev/null
         if test ! -f "$json"; then
-            cookie=$(get_cookie)
+            echo "picking new exit node"
+            sudo systemctl reload tor
         fi
     done
-    fi
 done
 }
+
+download go-seigen /1220/2585/?page=1
+download go-seigen /1220/2585/?page=2
+download go-seigen /1220/2585/?page=3
+download go-seigen /1220/2585/?page=4
+download go-seigen /1221/2586/
+download go-seigen /1221/2587/
+download go-seigen /1221/2588/
+download go-seigen /1221/2589/
+download go-seigen /1221/2597/
+download go-seigen /1225/2594/
+download go-seigen /1225/2595/
+download go-seigen /1225/2596/
+download go-seigen /1222/2590/?page=1
+download go-seigen /1223/2591/?page=1
+download go-seigen /1222/2590/?page=2
+download go-seigen /1224/2592/?page=1
+download go-seigen /1224/2593/?page=1
+download go-seigen /1224/2592/?page=2
+download go-seigen /1224/2593/?page=2
+download go-seigen /1223/2591/?page=2
+download go-seigen /1222/2590/?page=3
+download go-seigen /1223/2591/?page=3
+download go-seigen /1222/2590/?page=4
+download go-seigen /1223/2591/?page=4
+exit 0
 
 download hashimoto-masterpiece-collection /28506/17300/
 download hashimoto-masterpiece-collection /28506/17299/
 download hashimoto-masterpiece-collection /28506/17301/
-
-exit 0
 download ishida-tesuji /463/138865/?page=1
 download ishida-tesuji /463/138865/?page=2
 download ishida-tesuji /463/138865/?page=3

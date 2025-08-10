@@ -62,7 +62,7 @@ high-problems.log: FORCE
 wide-problems.log: FORCE
 - find problems -name "*.sgf" -exec grep "\[[lmnopqrs]" -l {} + | sort -V > $@
 
-# grep $book duplicates.log | cut -d/ -f4 | cut -d. -f1 | xargs -i sed -i s/^[^%]+*{}/% books/$book.tex
+# grep $book duplicates.log | cut -d/ -f4 | cut -d. -f1 | xargs -IX sed -i 's/^[^%].*{X}/%&%duplicate/g' books/$book.tex
 duplicates.log: FORCE
 - find problems -name "*.gnos" -exec md5sum {} + | sort | uniq -w32 -dD > $@
 
