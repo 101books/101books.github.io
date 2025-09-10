@@ -26,6 +26,27 @@ download() {
 done
 }
 
+download go-seigen-endgame /6/94/
+download go-seigen-endgame /6/95/
+download go-seigen-endgame /6/96/
+download go-seigen-endgame /6/97/
+download go-seigen-endgame /6/98/
+download go-seigen-endgame /6/99/
+download go-seigen-endgame /6/100/
+download go-seigen-endgame /6/101/
+download go-seigen-endgame /6/102/
+download go-seigen-endgame /6/103/
+download go-seigen-endgame /6/104/
+download go-seigen-endgame /6/105/
+download go-seigen-endgame /6/106/
+download go-seigen-endgame /6/107/
+download go-seigen-endgame /6/108/
+download go-seigen-endgame /6/109/
+download go-seigen-endgame /6/110/
+download go-seigen-endgame /6/111/
+download go-seigen-endgame /6/112/
+exit 0
+
 download go-seigen-tsumego /1220/2585/?page=1
 download go-seigen-tsumego /1220/2585/?page=2
 download go-seigen-tsumego /1220/2585/?page=3
@@ -50,8 +71,6 @@ download go-seigen-tsumego /1224/2593/?page=2
 download go-seigen-tsumego /1225/2594/
 download go-seigen-tsumego /1225/2595/
 download go-seigen-tsumego /1225/2596/
-exit 0
-
 download hashimoto-masterpiece-collection /28506/17300/
 download hashimoto-masterpiece-collection /28506/17299/
 download hashimoto-masterpiece-collection /28506/17301/
