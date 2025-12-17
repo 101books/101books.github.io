@@ -71,7 +71,7 @@ problem-count.log: FORCE
 - expr $$(pdfgrep -Poh "Problems: \K[0-9]+" pdfs/*.pdf | xargs -i bash -c "printf '{} + '")0 | tee $@
 
 page-count.log: FORCE
-- lynx -dump -listonly /home/olivier/workspace/101books/index.html | grep file | cut -d/ -f8-9 | xargs -i bash -c 'printf "{}:\t" && pdfinfo "{}" | grep Pages | awk "{print \$$2}"' | expand -t 10,40 | tee $@
+- lynx -dump -listonly $(shell pwd)/index.html | grep file | cut -d/ -f8-9 | xargs -i bash -c 'printf "{}:\t" && pdfinfo "{}" | grep Pages | awk "{print \$$2}"' | expand -t 10,40 | tee $@
 
 # (
 #   echo "\def\problems{%"

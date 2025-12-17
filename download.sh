@@ -13,6 +13,7 @@ download() {
         htmlq --text "div.timus.card-wrapper span span" |\
         while read -r problem_id; do
     json="problems/$book_name/$chapter_id/$problem_id.json"
+    mkdir -p "$(dirname "$json")"
     while test ! -f "$json"; do
         echo "downloading '$json'"
         curl --proxy "socks5h://localhost:9050" "https://www.101weiqi.com/q/$problem_id/" --silent |\
@@ -25,6 +26,12 @@ download() {
     done
 done
 }
+
+download small-leisure /68/260/?page=1
+download small-leisure /68/260/?page=2
+download small-leisure /68/260/?page=3
+download small-leisure /68/260/?page=4
+exit 0
 
 download go-seigen-endgame /6/94/
 download go-seigen-endgame /6/95/
@@ -45,8 +52,6 @@ download go-seigen-endgame /6/109/
 download go-seigen-endgame /6/110/
 download go-seigen-endgame /6/111/
 download go-seigen-endgame /6/112/
-exit 0
-
 download go-seigen-tsumego /1220/2585/?page=1
 download go-seigen-tsumego /1220/2585/?page=2
 download go-seigen-tsumego /1220/2585/?page=3
