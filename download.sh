@@ -27,6 +27,10 @@ download() {
 done
 }
 
+download 200-selected-problems-for-repetitive-practice /30412/22320/?page=1
+download 200-selected-problems-for-repetitive-practice /30412/22320/?page=2
+download 200-selected-problems-for-repetitive-practice /30412/22321/?page=1
+download 200-selected-problems-for-repetitive-practice /30412/22321/?page=2
 download go-endgame-techniques /29924/21263/?page=1
 download go-endgame-techniques /29924/21263/?page=2
 download go-endgame-techniques /29924/21264/?page=1
