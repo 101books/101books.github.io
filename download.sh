@@ -27,6 +27,35 @@ download() {
 done
 }
 
+download nie-weiping-tsumego /977/2292/
+download nie-weiping-tsumego /977/2293/
+download nie-weiping-tsumego /977/2294/
+download nie-weiping-tsumego /977/2295/
+download nie-weiping-tsumego /977/2296/
+download nie-weiping-tsumego /977/2297/
+download nie-weiping-tsumego /977/2298/
+download nie-weiping-tsumego /977/2299/
+download nie-weiping-tsumego /977/2300/
+download nie-weiping-tsumego /977/2301/
+download nie-weiping-endgame /42770/52754/
+download nie-weiping-endgame /42770/52755/
+download nie-weiping-endgame /42770/52756/
+download nie-weiping-endgame /42770/52757/
+download nie-weiping-endgame /42770/52758/
+download nie-weiping-endgame /42770/52759/
+download nie-weiping-endgame /42770/52760/
+download nie-weiping-endgame /42770/52761/
+download nie-weiping-endgame /42770/52762/
+download nie-weiping-endgame /42770/52763/
+download nie-weiping-endgame /42770/52764/
+download nie-weiping-endgame /42770/52765/
+download nie-weiping-endgame /42770/52766/?page=1
+download nie-weiping-endgame /42770/52766/?page=2
+download nie-weiping-endgame /42770/52767/
+download nie-weiping-tesuji /54131/139291/?page=1
+download nie-weiping-tesuji /54131/139291/?page=2
+download nie-weiping-tesuji /54131/139291/?page=3
+download nie-weiping-tesuji /54131/139291/?page=4
 download specialized-training-in-tsumego /60515/120507/
 download specialized-training-in-tsumego /60515/120508/
 download specialized-training-in-tsumego /60515/120509/
