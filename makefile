@@ -17,6 +17,7 @@ GSFLAGS := -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH
 # https://github.com/otrego/go-type1
 # https://packages.debian.org/stable/texlive
 # https://packages.debian.org/stable/ghostscript
+# https://packages.debian.org/stable/linkchecker
 
 books = $(shell ls books | grep -v header.tex | xargs -i echo pdfs/{})
 all: $(books:.tex=.pdf)
@@ -35,6 +36,9 @@ clean: FORCE
 
 watch: FORCE
 - git ls-files | entr make
+
+linkcheck: FORCE
+- linkchecker index.html
 
 levels.log: $$(shell find problems/$$(*F)/ -name "*.json")
 - find problems/* -type d | sort -V | while read b; do printf "$$b: "; find $$b -name "*.json" | sort -V \
