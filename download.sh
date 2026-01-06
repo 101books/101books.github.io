@@ -31,8 +31,6 @@ download small-leisure /68/260/?page=1
 download small-leisure /68/260/?page=2
 download small-leisure /68/260/?page=3
 download small-leisure /68/260/?page=4
-exit 0
-
 download go-seigen-endgame /6/94/
 download go-seigen-endgame /6/95/
 download go-seigen-endgame /6/96/
