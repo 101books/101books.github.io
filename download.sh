@@ -27,6 +27,11 @@ download() {
 done
 }
 
+download go-endgame-techniques /29924/21263/?page=1
+download go-endgame-techniques /29924/21263/?page=2
+download go-endgame-techniques /29924/21264/?page=1
+download go-endgame-techniques /29924/21264/?page=2
+download go-endgame-techniques /29924/21265/
 download nie-weiping-tsumego /977/2292/
 download nie-weiping-tsumego /977/2293/
 download nie-weiping-tsumego /977/2294/
