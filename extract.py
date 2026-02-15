@@ -145,7 +145,7 @@ def main(path: str) -> None:
   with open(path) as file:
     input_json = json.load(file)
 
-  best_answer = max(input_json["answers"], key=lambda x: (x["ty"] == 1, x["st"] == 2, x["ok_count"]))
+  best_answer = max(input_json["answers"], key=lambda x: (x["ty"] == 1, x["st"] == 2, x["ok_count"]), default={"pts": []})
   best_answer_moves = [x["p"] for x in best_answer["pts"]]
 
   theproblem = SGF.from_base64(input_json["c"], input_json["blackfirst"])
