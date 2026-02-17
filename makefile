@@ -20,7 +20,7 @@ SHELL = /bin/bash
 
 pdfs = $(shell ls books | grep -v header.tex | xargs -i echo pdfs/{} | sed s/.tex/.pdf/g)
 all: $(pdfs) index.html
-logs: levels.log high-problems.log wide-problems.log duplicates.log problem-count.log page-count.log
+logs: high-problems.log wide-problems.log duplicates.log problem-count.log page-count.log
 
 %.gnos: %.json
 - ./extract.py "$<"
@@ -44,22 +44,6 @@ clean: FORCE
 
 watch: FORCE
 - git ls-files | entr make
-
-levels.log: $$(shell find problems/$$(*F)/ -name "*.json")
-- find problems/* -type d | sort -V | while read b; do printf "$$b: "; find $$b -name "*.json" | sort -V \
-    | xargs -P8 -i jq --raw-output '.levelname' {} \
-    | sed -e s/20K/1/g -e s/19K/2/g -e s/18K/3/g -e s/17K/4/g -e s/16K/5/g -e s/15K/6/g -e s/14K/7/g \
-          -e s/13K/8/g -e s/12K/9/g -e s/11K/10/g -e s/10K/11/g -e s/9K/12/g -e s/8K/13/g -e s/7K/14/g \
-          -e s/6K/15/g -e s/5K/16/g -e s/4K/17/g -e s/3K/18/g -e s/2K/19/g -e s/1K/20/g -e s/1D/21/g \
-          -e s/2D/22/g -e s/3D/23/g -e s/4D/24/g -e s/5D/25/g -e s/6D/26/g -e s/7D/27/g -e s/8D/28/g \
-          -e s/9D/29/g -e s/+//g \
-    | awk '{for (i=1;i<=NF;++i) {sum+=$$i; ++n}} END {printf "x%.0fx\n", sum/n}' \
-    | sed -e s/x1x/20K/g -e s/x2x/19K/g -e s/x3x/18K/g -e s/x4x/17K/g -e s/x5x/16K/g -e s/x6x/15K/g \
-          -e s/x7x/14K/g -e s/x8x/13K/g -e s/x9x/12K/g -e s/x10x/11K/g -e s/x11x/10K/g -e s/x12x/9K/g \
-          -e s/x13x/8K/g -e s/x14x/7K/g -e s/x15x/6K/g -e s/x16x/5K/g -e s/x17x/4K/g -e s/x18x/3K/g \
-          -e s/x19x/2K/g -e s/x20x/1K/g -e s/x21x/1D/g -e s/x22x/2D/g -e s/x23x/3D/g -e s/x24x/4D/g \
-          -e s/x25x/5D/g -e s/x26x/6D/g -e s/x27x/7D/g -e s/x28x/8D/g -e s/x29x/9D/g; \
-  done > $@
 
 # grep $book duplicates.log | cut -d/ -f4 | cut -d. -f1 | xargs -IX sed -i 's/^[^%].*{X}/%&%duplicate/g' books/$book.tex
 duplicates.log: FORCE
@@ -98,3 +82,21 @@ wide-problems.log: FORCE
 #   echo "}"
 #   echo "\input{books/header}"
 # ) >> books/$book.tex
+
+# real_lvl=$(
+#     git ls-files | grep -P $(grep -Po '^\\p{\K\d+}{\d+' "books/$book.tex" | sed s@}{@/@g | xargs | sed 's/ /|/g') | grep .json |  sort -V \
+#         | xargs -P8 -i jq --raw-output '.levelname' {} \
+#         | sed -e s/20K/1/g -e s/19K/2/g -e s/18K/3/g -e s/17K/4/g -e s/16K/5/g -e s/15K/6/g -e s/14K/7/g \
+#                 -e s/13K/8/g -e s/12K/9/g -e s/11K/10/g -e s/10K/11/g -e s/9K/12/g -e s/8K/13/g -e s/7K/14/g \
+#                 -e s/6K/15/g -e s/5K/16/g -e s/4K/17/g -e s/3K/18/g -e s/2K/19/g -e s/1K/20/g -e s/1D/21/g \
+#                 -e s/2D/22/g -e s/3D/23/g -e s/4D/24/g -e s/5D/25/g -e s/6D/26/g -e s/7D/27/g -e s/8D/28/g \
+#                 -e s/9D/29/g -e s/+//g \
+#         | awk '{for (i=1;i<=NF;++i) {sum+=$i; ++n}} END {printf "x%.0fx\n", sum/n}' \
+#         | sed -e s/x1x/20' ky\\=u'/g -e s/x2x/19' ky\\=u'/g -e s/x3x/18' ky\\=u'/g -e s/x4x/17' ky\\=u'/g -e s/x5x/16' ky\\=u'/g -e s/x6x/15' ky\\=u'/g \
+#                 -e s/x7x/14' ky\\=u'/g -e s/x8x/13' ky\\=u'/g -e s/x9x/12' ky\\=u'/g -e s/x10x/11' ky\\=u'/g -e s/x11x/10' ky\\=u'/g -e s/x12x/9' ky\\=u'/g \
+#                 -e s/x13x/8' ky\\=u'/g -e s/x14x/7' ky\\=u'/g -e s/x15x/6' ky\\=u'/g -e s/x16x/5' ky\\=u'/g -e s/x17x/4' ky\\=u'/g -e s/x18x/3' ky\\=u'/g \
+#                 -e s/x19x/2' ky\\=u'/g -e s/x20x/1' ky\\=u'/g -e s/x21x/1' dan'/g -e s/x22x/2' dan'/g -e s/x23x/3' dan'/g -e s/x24x/4' dan'/g \
+#                 -e s/x25x/5' dan'/g -e s/x26x/6' dan'/g -e s/x27x/7' dan'/g -e s/x28x/8' dan'/g -e s/x29x/9' dan'/g;
+# )
+# book_lvl=$(grep -Po '\\def\\level{\K[^}]+' "books/$book.tex")
+# test "$real_lvl" == "$book_lvl" || sed -i "s/level{$(echo $book_lvl | sed 's/\\/\\\\/g')/level{$(echo $real_lvl | sed 's/\\/\\\\/g')/" "books/$book.tex"
