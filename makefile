@@ -1,7 +1,6 @@
 MAKEFLAGS += --no-builtin-rules
 MAKEFLAGS += --jobs=8
 SHELL = /bin/bash
-GSFLAGS := -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH
 .ONESHELL:
 .RECIPEPREFIX=-
 .SECONDEXPANSION:
@@ -11,7 +10,7 @@ GSFLAGS := -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH
 # overview of what makes what:
 # ./download.sh:  101weiqi.com -> problems/*.json
 # ./extract.py:   problems/*.json -> problems/*.gnos
-# pdflatex+gs:    books/*.tex + problems/*.gnos -> pdfs/*.pdf
+# pdflatex:       books/*.tex + problems/*.gnos -> pdfs/*.pdf
 
 # dependencies:
 # https://github.com/otrego/go-type1
@@ -19,11 +18,11 @@ GSFLAGS := -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH
 # https://packages.debian.org/stable/ghostscript
 # https://packages.debian.org/stable/linkchecker
 
-books = $(shell ls books | grep -v header.tex | xargs -i echo pdfs/{})
-all: $(books:.tex=.pdf)
+pdfs = $(shell ls books | grep -v header.tex | xargs -i echo pdfs/{} | sed s/.tex/.pdf/g)
+all: $(pdfs) index.html
 logs: levels.log high-problems.log wide-problems.log duplicates.log problem-count.log page-count.log
 
-%.gnos: %.json extract.py
+%.gnos: %.json
 - ./extract.py "$<"
 
 pdfs/%.pdf: books/%.tex books/header.tex $$(shell find problems/$$(*F)/ -name "*.json" | sed -e "s/.json/.gnos/")
@@ -31,14 +30,20 @@ pdfs/%.pdf: books/%.tex books/header.tex $$(shell find problems/$$(*F)/ -name "*
 - pdflatex -output-directory=.latex.out -interaction=nonstopmode "$<"
 - cp .latex.out/"$(@F)" "$@"
 
+index.html: index.py problem-count.log
+- ./index.py
+
+problem-count.log: $(pdfs)
+- expr $$(find pdfs -name "*.pdf" | xargs -n1 -P8 pdfgrep -Poh "Problems: \K[0-9]+" | xargs -i -P8 bash -c "printf '{} + '")0 | tee $@
+
+page-count.log: $(pdfs) index.html
+- lynx -dump -listonly $(shell pwd)/index.html | grep file | cut -d/ -f8-9 | xargs -i bash -c 'printf "{}:\t" && pdfinfo "{}" | grep Pages | awk "{print \$$2}"' | expand -t 10,40 | tee $@
+
 clean: FORCE
 - rm -rf -- .latex.out/* pdfs/*.pdf
 
 watch: FORCE
 - git ls-files | entr make
-
-linkcheck: FORCE
-- linkchecker index.html
 
 levels.log: $$(shell find problems/$$(*F)/ -name "*.json")
 - find problems/* -type d | sort -V | while read b; do printf "$$b: "; find $$b -name "*.json" | sort -V \
@@ -56,6 +61,10 @@ levels.log: $$(shell find problems/$$(*F)/ -name "*.json")
           -e s/x25x/5D/g -e s/x26x/6D/g -e s/x27x/7D/g -e s/x28x/8D/g -e s/x29x/9D/g; \
   done > $@
 
+# grep $book duplicates.log | cut -d/ -f4 | cut -d. -f1 | xargs -IX sed -i 's/^[^%].*{X}/%&%duplicate/g' books/$book.tex
+duplicates.log: FORCE
+- find problems -name "*.gnos" -exec md5sum {} + | sort | uniq -w32 -dD > $@
+
 high-problems.log: FORCE
 - find problems -name "*.sgf" -exec grep "[abcdefghi]\]" -l {} + \
   | grep -v problems/korean-endgame/1173/169874.sgf \
@@ -65,17 +74,6 @@ high-problems.log: FORCE
 
 wide-problems.log: FORCE
 - find problems -name "*.sgf" -exec grep "\[[lmnopqrs]" -l {} + | sort -V > $@
-
-# grep $book duplicates.log | cut -d/ -f4 | cut -d. -f1 | xargs -IX sed -i 's/^[^%].*{X}/%&%duplicate/g' books/$book.tex
-duplicates.log: FORCE
-- find problems -name "*.gnos" -exec md5sum {} + | sort | uniq -w32 -dD > $@
-
-# make problem-count.log && sed -i "s@.*booklets.*@      Here is a selection of $(ls pdfs | wc -l) go/weiqi/baduk booklets, featuring a total of $(sed -E ':a;s/^([0-9]+)([0-9]{3})/\1'\''\2/;ta' problem-count.log) problems.@" index.html
-problem-count.log: FORCE
-- expr $$(pdfgrep -Poh "Problems: \K[0-9]+" pdfs/*.pdf | xargs -i bash -c "printf '{} + '")0 | tee $@
-
-page-count.log: FORCE
-- lynx -dump -listonly $(shell pwd)/index.html | grep file | cut -d/ -f8-9 | xargs -i bash -c 'printf "{}:\t" && pdfinfo "{}" | grep Pages | awk "{print \$$2}"' | expand -t 10,40 | tee $@
 
 # (
 #   echo "\def\problems{%"
