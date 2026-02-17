@@ -27,6 +27,12 @@ download() {
 done
 }
 
+download bedtime-tsumego /27421/140516/?page=1
+download bedtime-tsumego /27421/140516/?page=2
+download bedtime-tsumego /27477/142165/?page=1
+download bedtime-tsumego /27477/142165/?page=2
+download bedtime-tsumego /27560/142030/?page=1
+download bedtime-tsumego /27560/142030/?page=2
 download 200-selected-problems-for-repetitive-practice /30412/22320/?page=1
 download 200-selected-problems-for-repetitive-practice /30412/22320/?page=2
 download 200-selected-problems-for-repetitive-practice /30412/22321/?page=1
