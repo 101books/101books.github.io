@@ -50,20 +50,22 @@ def generate_index():
     for category in ['tesuji', 'tsumego', 'endgame']:
         html_parts += f'    <p>{category.title()}:</p>\n    <ul>\n'
         
-        # Group by series and process in level order
         processed = set()
         for book in books[category]:
-            base_title = re.sub(r', Part \d+$', '', book['title'])
-            if base_title in processed:
+            if book['filename'] in processed:
                 continue
-            processed.add(base_title)
             
-            # Find all parts of this series
+            base_title = re.sub(r', Part \d+$', '', book['title'])
             parts = [b for b in books[category] if b['title'].startswith(base_title)]
+            parts.sort(key=lambda x: x['filename'])
+            
+            if book['filename'] != parts[0]['filename']:
+                continue
+            
+            for p in parts:
+                processed.add(p['filename'])
             
             if len(parts) > 1:
-                # Multi-part series
-                parts.sort(key=lambda x: x['filename'])
                 html_parts += f'      <li>\n        ({parts[0]["level"]}) {base_title}:\n        '
                 links = []
                 for p in parts:
@@ -72,7 +74,6 @@ def generate_index():
                     links.append(f'<a href="pdfs/{p["filename"]}.pdf">{num}</a>')
                 html_parts += ',\n        '.join(links) + '\n      </li>\n'
             else:
-                # Single book
                 html_parts += f'      <li>({book["level"]}) <a href="pdfs/{book["filename"]}.pdf">{book["title"]}</a></li>\n'
         
         html_parts += '    </ul>\n'
