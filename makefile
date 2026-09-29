@@ -15,6 +15,7 @@ SHELL = /bin/bash
 # dependencies:
 # https://github.com/otrego/go-type1
 # https://packages.debian.org/stable/texlive
+# https://packages.debian.org/stable/pdfgrep
 
 pdfs = $(shell ls books | grep -v header.tex | xargs -i echo pdfs/{} | sed s/.tex/.pdf/g)
 all: $(pdfs) index.html

@@ -25,10 +25,12 @@ def extract_book_info(filepath):
 def level_sort_key(book):
     level = book['level']
     if 'k' in level:
-        return 100 - int(re.search(r'(\d+)', level).group(1))
+        level_key = 100 - int(re.search(r'(\d+)', level).group(1))
     elif 'd' in level:
-        return 100 + int(re.search(r'(\d+)', level).group(1))
-    return 999
+        level_key = 100 + int(re.search(r'(\d+)', level).group(1))
+    else:
+        level_key = 999
+    return (level_key, book['title'].lower())
 
 def generate_index():
     books = {'tesuji': [], 'tsumego': [], 'endgame': []}
