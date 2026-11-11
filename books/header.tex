@@ -6,14 +6,13 @@
 \usepackage{parskip}
 \usepackage{gnos}
 \usepackage{varwidth}
-\usepackage{multicol}
-\usepackage{flushend}
 \usepackage[breakall]{truncate}
 \usepackage[twoside]{fancyhdr}
 \usepackage{CJKutf8}
 \usepackage[none]{hyphenat}
 \usepackage{hyperref}
 \usepackage{xcolor}
+\usepackage{graphicx}
 
 % https://tex.stackexchange.com/a/313605
 \pdfinfoomitdate=1
@@ -34,6 +33,11 @@
 \vbadness=10000
 
 \newcounter{pcount}%
+\ifdefined\problembook\else\edef\problembook{\jobname}\fi%
+
+% A solution diagram may annotate its problem number, e.g. (eliminated).
+% The generated diagram sets the note; it is cleared before each diagram.
+\def\solutionnote#1{\gdef\solutionnotetext{#1}}%
 
 \makeatletter
 \def\HUGE{\@setfontsize\Huge{35}{35}}
@@ -65,10 +69,31 @@
   \clearpage
 }
 
-\def\renderproblems{%
+% A row holds as many diagrams as fit between the margins. When the last row
+% is not full, pad it with empty cells so that its diagrams stay in the
+% columns they would occupy in a full row instead of being spread out.
+\newcount\diagramcolumns
+\newcount\diagramfilled
+\def\diagramfillrow{%
+  \diagramcolumns=\textwidth
+  \divide\diagramcolumns by \dimexpr\diagramwidth+5pt\relax
+  \diagramfilled=\value{pcount}%
+  \loop\ifnum\diagramfilled>0
+    \ifnum\numexpr\diagramfilled/\diagramcolumns*\diagramcolumns\relax=\diagramfilled
+      \diagramfilled=0
+    \else
+      \hspace{5pt}%
+      \hbox to\diagramwidth{}%
+      \allowbreak\hfil
+      \advance\diagramfilled by1
+    \fi
+  \repeat
+}
+\def\renderdiagrams#1{%
   \setcounter{pcount}{0}%
   \fancyhfoffset{-20pt}%
   \newgeometry{margin=40pt, top=102pt, bottom=80pt, headsep=40pt}%
+  \def\diagramwidth{150pt}%
   \def\line##1{\truncate[]{150pt}{##1}\\}%
   \def\hvspace{%
     \hspace{5pt}%
@@ -80,8 +105,9 @@
     \begin{varwidth}{\textwidth}%
       \center%
       \small%
-      \input{problems/\jobname/##1/##2.gnos}%
-      \normalsize\thepcount%
+      \input{problems/\problembook/##1/##2#1.gnos}%
+      \normalsize%
+      \thepcount%
     \end{varwidth}%
     \allowbreak%
     \hfil%
@@ -89,36 +115,130 @@
   \begin{center}%
   \hspace{-5pt}%
   \problems%
+  \diagramfillrow%
   \end{center}%
   \clearpage%
 }
 
-\def\rendersolutions{%
+\def\renderproblems{\renderdiagrams{}}%
+% Stack two independent grids on a portrait sheet. Scale each complete
+% diagram and its linked problem number at the same scale.
+\newbox\solutionrow
+\newbox\solutionpanel
+\newbox\solutiontoppanel
+\newcount\solutioncolumn
+\newcount\solutionrows
+\newcount\solutionpanelrows
+\newdimen\solutionrowheight
+\newdimen\solutioncellwidth
+\def\solutionsheet{%
+  \noindent\vbox{%
+    \offinterlineskip%
+    \box\solutiontoppanel%
+    \box\solutionpanel%
+  }%
+  \par\clearpage%
+}
+\def\solutionfinishpanel{%
+  \setbox\solutionpanel=\vbox to0.5\textheight{%
+    \unvbox\solutionpanel\vfil%
+  }%
+  \ifvoid\solutiontoppanel%
+    \setbox\solutiontoppanel=\box\solutionpanel%
+  \else%
+    \solutionsheet%
+  \fi%
+  \solutionrows=0\relax%
+}
+\def\solutionfinishrow{%
+  \loop\ifnum\solutioncolumn<4%
+    \setbox\solutionrow=\hbox{\unhbox\solutionrow\hfil\hbox to\solutioncellwidth{\hfil}}%
+    \advance\solutioncolumn by1\relax%
+  \repeat%
+  \setbox\solutionpanel=\vbox{%
+    \offinterlineskip%
+    \unvbox\solutionpanel%
+    \vbox to\solutionrowheight{%
+      % The header rule is inset 20pt.  Each horizontal grid line reaches
+      % half a scaled cell (4.2pt) past the diagram's bounding box, so the
+      % row is narrower than that by the same amount to bring the end of the
+      % lines in the last column level with the end of the rule.
+      \vfil\hbox{%
+        \kern15.8pt%
+        \hbox to\dimexpr\textwidth-31.3pt\relax{\unhbox\solutionrow}%
+      }\vfil%
+    }%
+  }%
+  \solutioncolumn=0\relax%
+  \advance\solutionrows by1\relax%
+  \ifnum\solutionrows=\solutionpanelrows \solutionfinishpanel\fi%
+}
+\def\solutionflush{%
+  \ifnum\solutioncolumn>0 \solutionfinishrow\fi%
+  \ifnum\solutionrows>0 \solutionfinishpanel\fi%
+  \ifvoid\solutiontoppanel\else\solutionsheet\fi%
+}
+\def\renderdiagramsolutions{%
+  \begingroup%
   \setcounter{pcount}{0}%
-  \fancyhfoffset{0pt}%
-  \newgeometry{margin=60pt, top=82pt, bottom=80pt}%
+  \fancyhfoffset{-20pt}%
+  % Six rows fill the text height exactly.  Lowering the top margin and the
+  % head separation by the same amount lifts the grid by that amount while
+  % leaving the running head where it is; the bottom margin takes the
+  % difference so the text height is unchanged.  The lift is half of the
+  % difference between the space above the first grid line and the space
+  % below the last one.
+  \newgeometry{margin=40pt, top=87.5pt, bottom=74.5pt, headsep=25.5pt}%
+  \solutionpanelrows=3\relax%
+  \solutionrowheight=\dimexpr\textheight/6\relax%
+  \solutioncolumn=0\relax%
+  \solutionrows=0\relax%
+  \def\solutionscale{0.75}%
+  \def\solutionrotation{0}%
+  % Gap above the number.  The row height is fixed, so whatever is taken
+  % from here is added to the gap below the number: this value splits the
+  % space between the two diagrams evenly.
+  \def\solutionnumberskip{2.4pt}%
+  \def\diagramwidth{150pt}%
+  % A cell is exactly as wide as the scaled diagram, so nothing overflows
+  % it.  \dimexpr only takes literal factors, hence 3/4 for \solutionscale.
+  \solutioncellwidth=\dimexpr\diagramwidth*3/4\relax%
+  \def\line##1{\truncate[]{150pt}{##1}\\}%
   \def\p##1##2{%
     \stepcounter{pcount}%
-    \noindent%
-    (\href{https://www.101weiqi.com/q/##2}{\thepcount})%
-    \:\:%
-    \input{problems/\jobname/##1/##2.solution}\unskip%
-    \par%
+    \global\let\solutionnotetext\empty%
+    \setbox\solutionrow=\hbox{%
+      \unhbox\solutionrow%
+      \ifnum\solutioncolumn>0 \hfil\fi%
+      \hbox to\solutioncellwidth{%
+        \hfil%
+        \scalebox{\solutionscale}{%
+          \begin{varwidth}{150pt}%
+            \centering\small%
+            \rotatebox{\solutionrotation}{%
+              \begin{varwidth}{\diagramwidth}%
+                \centering%
+                \input{problems/\problembook/##1/##2.solution}%
+              \end{varwidth}%
+            }\par\vspace{\solutionnumberskip}%
+            \normalsize%
+            \href{https://www.101weiqi.com/q/##2}{\thepcount}%
+            \ifx\solutionnotetext\empty\else~(\solutionnotetext)\fi%
+          \end{varwidth}%
+        }%
+        \hfil%
+      }%
+    }%
+    \advance\solutioncolumn by1\relax%
+    \ifnum\solutioncolumn=4 \solutionfinishrow\fi%
   }%
-  {%
-    \footnotesize%
-    \setlength{\parskip}{2.7pt}%
-    \setlength{\columnsep}{30pt}%
-    \begin{multicols}{2}%
-      \raggedcolumns%
-      \problems%
-    \end{multicols}%
-  }%
-  \clearpage%
+  \problems%
+  \solutionflush%
+  \endgroup%
 }
 
 \begin{document}
 \rendertitle%
 \renderproblems%
-\rendersolutions%
+\renderdiagramsolutions%
 \end{document}

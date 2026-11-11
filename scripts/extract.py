@@ -59,7 +59,8 @@ class SGF:
         moves = "".join(f";{'B' if i%2==0 else 'W'}[{m}]" for i, m in enumerate(self.moves))
         return f"(;\nAB{ab}\nAW{aw}\n{moves})"
 
-    def to_gnos(self, height_cutoff: int = 11) -> str:
+    def to_gnos(self, height_cutoff: int = 11, solution: bool = False,
+                eliminated: bool = False) -> str:
         goban = [
             list("<(((((((((((((((((>"),
             list(r"[+++++++++++++++++]"),
@@ -90,14 +91,86 @@ class SGF:
             col, row = to_coord(move)
             goban[row][col] = "!"
 
-        char91 = lambda c: "\\char91" if c == "[" else c
-        result = "{\\gnos%\n"
-        goban = goban[-height_cutoff:]
-        for row in goban:
-            row_str = "".join(map(char91, row))
-            result += "\\line{" + row_str + "}\n"
-        result += "}%"
+        # Keep the first stone shown at each intersection, even if it is
+        # captured later. Subsequent moves there refer back to its number.
+        numbered = {}
+        initial_labels = {}
+        annotations = []
+        def labeled_stone(label, black):
+            base = "@" if black else "!"
+            color = "white" if black else "black"
+            return ("{" + base + r"\llap{\makebox[12pt]{"
+                    r"\raisebox{3pt}{\normalfont\footnotesize"
+                    rf"\color{{{color}}}{label}" + "}}}}")
 
+        def stone(number):
+            return labeled_stone(number, number % 2 == 1)
+
+        # An eliminated problem has no solution to show, so its diagram is
+        # the plain problem board; the marker lives next to the number.
+        if solution and not eliminated:
+            for number, move in enumerate(self.moves[:14], 1):
+                col, row = to_coord(move)
+                if move in numbered:
+                    annotations.append([stone(number), r"\gnosEmptyLbl{\normalfont in}", stone(numbered[move])])
+                elif move in self.initial_blacks or move in self.initial_whites:
+                    if move not in initial_labels:
+                        initial_labels[move] = len(initial_labels) + 1
+                    label = initial_labels[move]
+                    letter = chr(ord('A') + label - 1)
+                    letter_stone = labeled_stone(letter, move in self.initial_blacks)
+                    annotations.append([stone(number), r"\gnosEmptyLbl{\normalfont in}", letter_stone])
+                    goban[row][col] = letter_stone
+                else:
+                    numbered[move] = number
+                    goban[row][col] = stone(number)
+
+        def place_annotations(width):
+            board = [row.copy() for row in goban]
+            occupied = {to_coord(move) for move in
+                        self.initial_blacks + self.initial_whites + self.moves[:14]}
+            top = max(0, 19 - height_cutoff)
+            columns = range(width - 3, -1, -1)
+
+            def clear(col, row):
+                return all((x, row) not in occupied for x in range(col, col + 3))
+
+            # Align the three-cell annotations at the top right of the goban.
+            # Crowded positions use the rightmost free run on successive rows
+            # rather than overwriting any problem or solution stone.
+            slots = []
+            for col in columns:
+                if all(clear(col, row) for row in range(top, top + len(annotations))):
+                    slots = [(col, row) for row in range(top, top + len(annotations))]
+                    break
+            if not slots:
+                for row in range(top, 19):
+                    for col in columns:
+                        if clear(col, row):
+                            slots.append((col, row))
+                            break
+            if len(slots) < len(annotations):
+                raise ValueError("No empty goban space for solution annotations")
+            for (col, row), annotation in zip(slots, annotations):
+                board[row][col:col + 3] = annotation
+            return board
+        if solution and annotations:
+            narrow = place_annotations(12)
+            wide = place_annotations(19)
+        char91 = lambda c: "\\char91" if c == "[" else c
+        result = "{\\gnos\\gnosIntWd=12pt%\n" if solution else "{\\gnos%\n"
+        for row_number in range(max(0, 19 - height_cutoff), 19):
+            separator = r"\allowbreak" if solution else ""
+            row = separator.join(map(char91, goban[row_number]))
+            if solution and annotations:
+                # Mixed stone fonts and text need explicit cell breakpoints
+                # for the original \truncate-based renderer.
+                small = r"\allowbreak".join(map(char91, narrow[row_number]))
+                large = r"\allowbreak".join(map(char91, wide[row_number]))
+                row = (small if small == large else
+                       r"\ifdim\diagramwidth>150pt " + large + r"\else " + small + r"\fi")
+            result += "\\line{" + row + "}\n"
+        result += "}%"
         return result
 
     @staticmethod
@@ -135,13 +208,6 @@ class SGF:
         return SGF(initial_whites=aw_list, initial_blacks=ab_list, moves=moves_list)
 
 
-def to_goban_coordinate(move: str) -> str:
-    cols = list("ABCDEFGHJKLMNOPQRST")
-    col = cols[ord(move[0]) - ord("a")]
-    row = 19 - ord(move[1]) + ord("a")
-    return f"{col}{row}"
-
-
 def process_one(path: str) -> None:
     assert path.endswith(".json")
     with open(path) as file:
@@ -176,18 +242,18 @@ def process_one(path: str) -> None:
     ]
     # last key component is a tie breaker
     theproblem = min(permutations, key=lambda x: (x.height, x.width, sorted(x.initial_blacks)))
-    if input_json["status"] == 1:
-        solution_moves = "eliminated"
-    else:
-        solution_moves = "~".join(map(to_goban_coordinate, theproblem.moves[:14]))
 
     stem = path.removesuffix(".json")
+    eliminated = input_json["status"] == 1
     with open(f"{stem}.sgf", "w") as file:
         file.write(theproblem.to_sgf() + "\n")
     with open(f"{stem}.gnos", "w") as file:
-        file.write(theproblem.to_gnos() + "\n")
+        file.write(theproblem.to_gnos(eliminated=eliminated) + "\n")
+    # An eliminated problem gets no solution overlay; its diagram only
+    # carries a note that the renderer prints next to the problem number.
+    note = "\\solutionnote{eliminated}%\n" if eliminated else ""
     with open(f"{stem}.solution", "w") as file:
-        file.write(solution_moves + "\n")
+        file.write(note + theproblem.to_gnos(solution=True, eliminated=eliminated) + "\n")
 
 
 def main(paths: list[str]) -> None:
