@@ -19,7 +19,7 @@ SHELL = /bin/bash
 
 pdfs = $(patsubst books/%.tex,pdfs/%.pdf,$(filter-out books/header.tex,$(wildcard books/*.tex)))
 all: $(pdfs) index.html
-logs: high-problems.log wide-problems.log duplicates.log problem-count.log page-count.log
+logs: high-problems.log wide-problems.log duplicates.log problem-count.log page-count.log book-counts.log
 
 .extracted.sentinel: $(shell find problems -name "*.json" -newer ".extracted.sentinel" -print -quit) scripts/extract.py
 - find problems -name "*.json" -print0 | xargs -0 -r -P8 -n 512 scripts/extract.py
@@ -47,6 +47,11 @@ watch: FORCE
 # grep $book duplicates.log | cut -d/ -f4 | cut -d. -f1 | xargs -IX sed -i 's/^[^%].*{X}/%&%duplicate/g' books/$book.tex
 duplicates.log: FORCE
 - find problems -name "*.gnos" -exec md5sum {} + | sort | uniq -w32 -dD > $@
+
+# per book (parts merged): problems commented out as duplicates, and problems
+# still needed to fill the last page (12) or the last two-page spread (24)
+book-counts.log: FORCE
+- scripts/book-counts.py > $@
 
 high-problems.log: FORCE
 - find problems -name "*.sgf" -exec grep "[abcdefghi]\]" -l {} + \
