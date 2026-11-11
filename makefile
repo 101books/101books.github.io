@@ -66,13 +66,12 @@ wide-problems.log: FORCE
 #     | sort -V \
 #     | cut -d/ -f3-4 | sed s/.sgf// | sed "s|/|}{|"  \
 #     | xargs -i echo "\p{{}}%"
-#   echo "\halfgoban%"
 #   find problems/$book -name *.sgf \
 #     | grep -v --file high-problems.log \
 #     | grep --file wide-problems.log \
 #     | sort -V \
 #     | cut -d/ -f3-4 | sed s/.sgf// | sed "s|/|}{|"  \
-#     | xargs -i echo "\p{{}}%"
+#     | xargs -i echo "%\p{{}}%halfgoban"
 #   find problems/$book -name *.sgf \
 #     | grep --file high-problems.log \
 #     | sort -V \

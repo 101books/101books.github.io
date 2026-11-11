@@ -41,8 +41,6 @@
 
 \def\countproblems{%
   \setcounter{pcount}{0}%
-  \def\halfgoban{}%
-  \def\halfgobanphantom{}%
   \def\p##1##2{\stepcounter{pcount}}%
   \problems%
   \thepcount%
@@ -76,23 +74,6 @@
     \hspace{5pt}%
     \vspace{5pt}%
   }%
-  \def\halfgoban{%
-    \def\line####1{####1\\}%
-    \def\hvspace{%
-      \hspace{18.2pt}%
-      \vspace{7.5pt}%
-    }%
-    \clearpage%
-    \hspace{-18.2pt}%
-  }%
-  \def\halfgobanphantom{
-    \def\line####1{####1\\}%
-    \def\hvspace{%
-      \hspace{18.2pt}%
-      \vspace{7.5pt}%
-    }%
-    \hspace{-18.2pt}%
-  }%
   \def\p##1##2{%
     \stepcounter{pcount}%
     \hvspace%
@@ -116,8 +97,6 @@
   \setcounter{pcount}{0}%
   \fancyhfoffset{0pt}%
   \newgeometry{margin=60pt, top=82pt, bottom=80pt}%
-  \def\halfgoban{}%
-  \def\halfgobanphantom{}%
   \def\p##1##2{%
     \stepcounter{pcount}%
     \noindent%
