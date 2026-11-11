@@ -8,8 +8,8 @@ SHELL = /bin/bash
 .SECONDARY:
 
 # overview of what makes what:
-# ./download.sh:  101weiqi.com -> problems/*.json
-# ./extract.py:   problems/*.json -> problems/*.gnos
+# scripts/download.sh:  101weiqi.com -> problems/*.json
+# scripts/extract.py:   problems/*.json -> problems/*.gnos
 # pdflatex:       books/*.tex + problems/*.gnos -> pdfs/*.pdf
 
 # dependencies:
@@ -22,16 +22,16 @@ pdfs = $(shell ls books | grep -v header.tex | xargs -i echo pdfs/{} | sed s/.te
 all: $(pdfs) index.html
 logs: high-problems.log wide-problems.log duplicates.log problem-count.log page-count.log
 
-.extracted.sentinel: $$(shell find problems -name "*.json") extract.py
-- find problems -name "*.json" -print0 | xargs -0 -r -P8 -n 512 ./extract.py
+.extracted.sentinel: $$(shell find problems -name "*.json") scripts/extract.py
+- find problems -name "*.json" -print0 | xargs -0 -r -P8 -n 512 scripts/extract.py
 - touch "$@"
 
 pdfs/%.pdf: books/%.tex books/header.tex .extracted.sentinel
 - pdflatex -output-directory=.latex.out -interaction=nonstopmode "$<"
 - cp .latex.out/"$(@F)" "$@"
 
-index.html: index.py problem-count.log
-- ./index.py
+index.html: scripts/index.py problem-count.log
+- scripts/index.py
 
 problem-count.log: $(pdfs)
 - pdfgrep -Poh --page-range=1 "Problems: \K[0-9]+" $^ | paste -sd+ | bc > "$@"
